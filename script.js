@@ -5,9 +5,10 @@ const SUPABASE_KEY = "sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB";
 // 🚀 FUNÇÃO PRINCIPAL
 async function loadCourses() {
   try {
-    const coursesContainer = document.getElementById('courses-grid');
-    if (!container) {
-      console.error("Elemento #courses não encontrado no HTML");
+    const coursesContainer = document.getElementById("courses-grid");
+
+    if (!coursesContainer) {
+      console.error("Elemento #courses-grid não encontrado no HTML");
       return;
     }
 
@@ -26,10 +27,10 @@ async function loadCourses() {
     }
 
     const courses = await response.json();
-    container.innerHTML = "";
+    coursesContainer.innerHTML = "";
 
     if (courses.length === 0) {
-      container.innerHTML =
+      coursesContainer.innerHTML =
         "<p style='text-align:center;color:#aaa'>Nenhum curso disponível no momento.</p>";
       return;
     }
@@ -39,21 +40,22 @@ async function loadCourses() {
       card.className = "card";
 
       card.innerHTML = `
-        <img src="${course.image_url}" alt="${course.title}">
+        <img src="${course.image_url || ''}" alt="${course.title}">
         <h3>${course.title}</h3>
         <p>${course.description}</p>
-        <strong>${course.price}</strong>
+        <strong>R$ ${course.price}</strong>
         <a href="${course.checkout_url}" target="_blank">Comprar agora</a>
       `;
 
-      container.appendChild(card);
+      coursesContainer.appendChild(card);
     });
 
   } catch (error) {
     console.error("Erro ao buscar cursos:", error);
-    const coursesContainer = document.getElementById('courses-grid');
-    if (container) {
-      container.innerHTML =
+
+    const coursesContainer = document.getElementById("courses-grid");
+    if (coursesContainer) {
+      coursesContainer.innerHTML =
         "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
     }
   }
@@ -61,5 +63,3 @@ async function loadCourses() {
 
 // 🧠 GARANTE QUE O HTML CARREGOU
 document.addEventListener("DOMContentLoaded", loadCourses);
-
-
