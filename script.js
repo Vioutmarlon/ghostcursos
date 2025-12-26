@@ -1,17 +1,16 @@
-// CONFIGURAÇÃO DO SUPABASE
-// Substitua as variáveis abaixo pelos dados do seu projeto Supabase
+// 🔐 CONFIGURAÇÃO SUPABASE
 const SUPABASE_URL = "https://wskajqppnvjdxyitkrvd.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB";
+const SUPABASE_KEY = "sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB";
 
-const domElements = {
-    loading: document.getElementById('loading'),
-    error: document.getElementById('error-message'),
-    grid: document.getElementById('courses-grid'),
-    gridContainer: document.querySelector('.courses-grid')
-};
-
+// 🚀 FUNÇÃO PRINCIPAL
 async function loadCourses() {
   try {
+    const container = document.getElementById("courses");
+    if (!container) {
+      console.error("Elemento #courses não encontrado no HTML");
+      return;
+    }
+
     const response = await fetch(
       `${SUPABASE_URL}/rest/v1/courses?select=*&active=eq.true`,
       {
@@ -27,8 +26,13 @@ async function loadCourses() {
     }
 
     const courses = await response.json();
-    const container = document.getElementById("courses");
     container.innerHTML = "";
+
+    if (courses.length === 0) {
+      container.innerHTML =
+        "<p style='text-align:center;color:#aaa'>Nenhum curso disponível no momento.</p>";
+      return;
+    }
 
     courses.forEach(course => {
       const card = document.createElement("div");
@@ -47,13 +51,13 @@ async function loadCourses() {
 
   } catch (error) {
     console.error("Erro ao buscar cursos:", error);
-    document.getElementById("courses").innerHTML =
-      "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
+    const container = document.getElementById("courses");
+    if (container) {
+      container.innerHTML =
+        "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
+    }
   }
 }
 
-loadCourses();
-
-
-// Inicialização
-document.addEventListener('DOMContentLoaded', fetchCourses);
+// 🧠 GARANTE QUE O HTML CARREGOU
+document.addEventListener("DOMContentLoaded", loadCourses);
