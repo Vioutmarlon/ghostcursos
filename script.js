@@ -41,13 +41,28 @@ async function loadCourses() {
         card.className = "card";
 
         card.innerHTML = `
-          <img src="${course.image_url || ''}" loading="lazy" alt="${course.title}">
-          <h3>${course.title}</h3>
-          <p>${course.description}</p>
-          <strong>${course.price}</strong>
-          <a href="${course.checkout_url}" target="_blank">Comprar agora</a>
-        `;
+  <div class="card-image">
+    <img src="${course.image_url || ''}" loading="lazy" alt="${course.title}">
+  </div>
 
+  <div class="card-content">
+    <h3 class="card-title">${course.title}</h3>
+    <p class="card-description">
+      ${course.description || 'Descrição não disponível.'}
+    </p>
+
+    <div class="card-footer">
+      <span class="card-price">${course.price}</span>
+      <a 
+        href="${course.checkout_url}" 
+        target="_blank" 
+        class="buy-button"
+      >
+        Comprar agora
+      </a>
+    </div>
+  </div>
+`;
         grid.appendChild(card);
       });
     }
@@ -62,3 +77,4 @@ async function loadCourses() {
     error.classList.remove("hidden");
   }
 }
+
