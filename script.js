@@ -2,14 +2,17 @@
 const SUPABASE_URL = "https://wskajqppnvjdxyitkrvd.supabase.co";
 const SUPABASE_KEY = "sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB";
 
-// 🚀 FUNÇÃO PRINCIPAL
-async function loadCourses() {
-  const container = document.getElementById("courses-grid");
+document.addEventListener("DOMContentLoaded", loadCourses);
 
-  if (!container) {
-    console.error("Elemento #courses-grid não encontrado no HTML");
-    return;
-  }
+async function loadCourses() {
+  const loading = document.getElementById("loading");
+  const error = document.getElementById("error-message");
+  const grid = document.getElementById("courses-grid");
+
+  // Estado inicial
+  loading.classList.remove("hidden");
+  error.classList.add("hidden");
+  grid.classList.add("hidden");
 
   try {
     const response = await fetch(
@@ -27,34 +30,35 @@ async function loadCourses() {
     }
 
     const courses = await response.json();
-    container.innerHTML = "";
+    grid.innerHTML = "";
 
     if (courses.length === 0) {
-      container.innerHTML =
+      grid.innerHTML =
         "<p style='text-align:center;color:#aaa'>Nenhum curso disponível no momento.</p>";
-      return;
+    } else {
+      courses.forEach(course => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <img src="${course.image_url || ''}" loading="lazy" alt="${course.title}">
+          <h3>${course.title}</h3>
+          <p>${course.description}</p>
+          <strong>${course.price}</strong>
+          <a href="${course.checkout_url}" target="_blank">Comprar agora</a>
+        `;
+
+        grid.appendChild(card);
+      });
     }
 
-    courses.forEach((course) => {
-      const card = document.createElement("div");
-      card.className = "card";
+    // Mostra cursos
+    loading.classList.add("hidden");
+    grid.classList.remove("hidden");
 
-      card.innerHTML = `
-        <img src="${course.image_url || ''}" alt="${course.title}">
-        <h3>${course.title}</h3>
-        <p>${course.description}</p>
-        <strong>${course.price}</strong>
-        <a href="${course.checkout_url}" target="_blank">Comprar agora</a>
-      `;
-
-      container.appendChild(card);
-    });
-  } catch (error) {
-    console.error("Erro ao buscar cursos:", error);
-    container.innerHTML =
-      "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
+  } catch (err) {
+    console.error("Erro ao carregar cursos:", err);
+    loading.classList.add("hidden");
+    error.classList.remove("hidden");
   }
 }
-
-// 🧠 GARANTE QUE O HTML CARREGOU
-document.addEventListener("DOMContentLoaded", loadCourses);
