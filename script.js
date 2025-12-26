@@ -5,7 +5,7 @@ const SUPABASE_KEY = "sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB";
 // 🚀 FUNÇÃO PRINCIPAL
 async function loadCourses() {
   try {
-    const container = document.getElementById("courses");
+    const coursesContainer = document.getElementById('courses-grid');
     if (!container) {
       console.error("Elemento #courses não encontrado no HTML");
       return;
@@ -61,4 +61,5 @@ async function loadCourses() {
 
 // 🧠 GARANTE QUE O HTML CARREGOU
 document.addEventListener("DOMContentLoaded", loadCourses);
+
 
