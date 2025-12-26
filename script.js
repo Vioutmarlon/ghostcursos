@@ -14,23 +14,19 @@ async function loadCourses() {
   grid.innerHTML = "";
 
   try {
-    const response = await fetch(
+    const res = await fetch(
       `${SUPABASE_URL}/rest/v1/courses?select=*&status=eq.true`,
       {
         headers: {
           apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-        },
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        }
       }
     );
 
-    if (!response.ok) throw new Error("Erro API");
+    if (!res.ok) throw new Error("Erro Supabase");
 
-    const courses = await response.json();
-
-    if (!courses.length) {
-      grid.innerHTML = "<p style='text-align:center'>Nenhum curso disponível.</p>";
-    }
+    const courses = await res.json();
 
     courses.forEach(course => {
       const card = document.createElement("div");
@@ -38,12 +34,14 @@ async function loadCourses() {
 
       card.innerHTML = `
         <img src="${course.image_url || ''}" alt="${course.title}">
-        <div class="content">
-          <h3>${course.title}</h3>
-          <p>${course.description || "Descrição não informada."}</p>
-          <div class="footer">
-            <span>R$ ${course.price || "0,00"}</span>
-            <a href="${course.checkout_url || '#'}" target="_blank">Comprar</a>
+        <div class="card-content">
+          <h3 class="card-title">${course.title}</h3>
+          <p class="card-description">${course.description || "Descrição não informada."}</p>
+          <div class="card-footer">
+            <span class="card-price">R$ ${course.price || "0,00"}</span>
+            <a href="${course.checkout_url}" target="_blank" class="buy-button">
+              Comprar
+            </a>
           </div>
         </div>
       `;
