@@ -57,4 +57,3 @@ loadCourses();
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', fetchCourses);
-
