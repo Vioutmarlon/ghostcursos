@@ -9,11 +9,9 @@ async function loadCourses() {
   const error = document.getElementById("error-message");
   const grid = document.getElementById("courses-grid");
 
-  // 🔄 Estado inicial
   loading.classList.remove("hidden");
   error.classList.add("hidden");
   grid.classList.add("hidden");
-  grid.innerHTML = "";
 
   try {
     const response = await fetch(
@@ -26,64 +24,57 @@ async function loadCourses() {
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Erro API: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Erro API: ${response.status}`);
 
     const courses = await response.json();
+    grid.innerHTML = "";
 
-    if (!courses || courses.length === 0) {
+    if (!courses.length) {
       grid.innerHTML = `
-        <p style="text-align:center;color:#aaa">
+        <p class="empty-message">
           Nenhum curso disponível no momento.
-        </p>
-      `;
-    } else {
-      courses.forEach(course => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        const priceFormatted = formatPrice(course.price);
-        const description = course.description
-          ? truncateText(course.description, 120)
-          : "Curso completo com acesso imediato após a compra.";
-
-        card.innerHTML = `
-          <div class="card-image">
-            <img 
-              src="${course.image_url || 'https://via.placeholder.com/600x400?text=GhostCursos'}"
-              loading="lazy"
-              alt="${course.title}"
-            >
-          </div>
-
-          <div class="card-content">
-            <h3 class="card-title">${course.title}</h3>
-
-            <p class="card-description">
-              ${description}
-            </p>
-
-            <div class="card-footer">
-              <span class="card-price">${priceFormatted}</span>
-
-              <a 
-                href="${course.checkout_url}" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                class="buy-button"
-              >
-                Comprar agora
-              </a>
-            </div>
-          </div>
-        `;
-
-        grid.appendChild(card);
-      });
+        </p>`;
     }
 
-    // ✅ Mostra cursos
+    courses.forEach(course => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const image = course.image_url
+        ? `<img src="${course.image_url}" alt="${course.title}" loading="lazy">`
+        : `<div class="image-placeholder">👻</div>`;
+
+      const price = course.price
+        ? `R$ ${Number(course.price).toFixed(2).replace(".", ",")}`
+        : "Preço sob consulta";
+
+      card.innerHTML = `
+        <div class="card-image">
+          ${image}
+        </div>
+
+        <div class="card-content">
+          <h3 class="card-title">${course.title}</h3>
+
+          <p class="card-description">
+            ${course.description || "Descrição não informada."}
+          </p>
+
+          <div class="card-footer">
+            <span class="card-price">${price}</span>
+
+            <a href="${course.checkout_url || "#"}"
+               target="_blank"
+               class="buy-button">
+              Comprar agora
+            </a>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+
     loading.classList.add("hidden");
     grid.classList.remove("hidden");
 
@@ -93,16 +84,3 @@ async function loadCourses() {
     error.classList.remove("hidden");
   }
 }
-
-// 💰 Formata preço (R$)
-function formatPrice(value) {
-  if (!value) return "Consultar";
-  return Number(value).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
-}
-
-// ✂️ Limita descrição (UX melhor)
-function truncateText(text, maxLength) {
-  if (text.length <
