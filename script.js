@@ -1,7 +1,7 @@
 // CONFIGURAÇÃO DO SUPABASE
 // Substitua as variáveis abaixo pelos dados do seu projeto Supabase
-const SUPABASE_URL = 'https://wskajqppnvjdxyitkrvd.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB';
+const SUPABASE_URL = "https://wskajqppnvjdxyitkrvd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB";
 
 const domElements = {
     loading: document.getElementById('loading'),
