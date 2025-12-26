@@ -10,96 +10,51 @@ const domElements = {
     gridContainer: document.querySelector('.courses-grid')
 };
 
-async function fetchCourses() {
-    // Verificação de segurança para as chaves
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        console.warn('⚠️ Supabase Keys não configuradas. Preencha SUPABASE_URL e SUPABASE_ANON_KEY no arquivo script.js.');
-        showError('Configure as chaves do Supabase no arquivo script.js para visualizar os cursos.');
-        return;
-    }
-
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/courses?select=*&status=eq.active`, {
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erro API: ${response.status} ${response.statusText}`);
+async function loadCourses() {
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/courses?select=*&active=eq.true`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
         }
+      }
+    );
 
-        const courses = await response.json();
-        renderCourses(courses);
-
-    } catch (error) {
-        console.error('Erro ao buscar cursos:', error);
-        showError();
-    }
-}
-
-function renderCourses(courses) {
-    domElements.loading.classList.add('hidden');
-
-    if (!courses || courses.length === 0) {
-        domElements.error.innerHTML = "<p>Nenhum curso ativo encontrado.</p>";
-        domElements.error.classList.remove('hidden');
-        return;
+    if (!response.ok) {
+      throw new Error(`Erro API: ${response.status}`);
     }
 
-    domElements.grid.innerHTML = '';
+    const courses = await response.json();
+    const container = document.getElementById("courses");
+    container.innerHTML = "";
 
     courses.forEach(course => {
-        const card = createCourseCard(course);
-        domElements.grid.appendChild(card);
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <img src="${course.image_url}" alt="${course.title}">
+        <h3>${course.title}</h3>
+        <p>${course.description}</p>
+        <strong>${course.price}</strong>
+        <a href="${course.checkout_url}" target="_blank">Comprar agora</a>
+      `;
+
+      container.appendChild(card);
     });
 
-    domElements.grid.classList.remove('hidden');
+  } catch (error) {
+    console.error("Erro ao buscar cursos:", error);
+    document.getElementById("courses").innerHTML =
+      "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
+  }
 }
 
-function createCourseCard(course) {
-    const article = document.createElement('article');
-    article.className = 'course-card';
+loadCourses();
 
-    // Formatando preço
-    const priceFormatted = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(course.price || 0);
-
-    // Fallback de imagem
-    const imageUrl = course.image_url || 'https://via.placeholder.com/600x400/000000/ff003c?text=GhostCursos';
-
-    article.innerHTML = `
-        <div class="card-image-wrapper">
-            <img src="${imageUrl}" alt="${course.title}" class="card-image" loading="lazy">
-        </div>
-        <div class="card-content">
-            <div>
-                <h2 class="card-title">${course.title}</h2>
-                <p class="card-desc">${course.description || 'Sem descrição.'}</p>
-            </div>
-            <div class="card-footer">
-                <span class="card-price">${priceFormatted}</span>
-                <a href="${course.checkout_url}" target="_blank" rel="noopener noreferrer" class="btn-buy">
-                    Comprar
-                </a>
-            </div>
-        </div>
-    `;
-
-    return article;
-}
-
-function showError(msg) {
-    domElements.loading.classList.add('hidden');
-    domElements.error.classList.remove('hidden');
-    if (msg) {
-        domElements.error.querySelector('p').textContent = msg;
-    }
-}
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', fetchCourses);
+
