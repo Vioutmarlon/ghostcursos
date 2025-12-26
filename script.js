@@ -4,21 +4,21 @@ const SUPABASE_KEY = "sb_publishable_qRL01v8o56OASdOqtDMZxg_OqeOWcOB";
 
 // 🚀 FUNÇÃO PRINCIPAL
 async function loadCourses() {
+  const container = document.getElementById("courses-grid");
+
+  if (!container) {
+    console.error("Elemento #courses-grid não encontrado no HTML");
+    return;
+  }
+
   try {
-    const coursesContainer = document.getElementById("courses-grid");
-
-    if (!coursesContainer) {
-      console.error("Elemento #courses-grid não encontrado no HTML");
-      return;
-    }
-
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/courses?select=*&active=eq.true`,
+      `${SUPABASE_URL}/rest/v1/courses?select=*&status=eq.true`,
       {
         headers: {
           apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`
-        }
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
       }
     );
 
@@ -27,15 +27,15 @@ async function loadCourses() {
     }
 
     const courses = await response.json();
-    coursesContainer.innerHTML = "";
+    container.innerHTML = "";
 
     if (courses.length === 0) {
-      coursesContainer.innerHTML =
+      container.innerHTML =
         "<p style='text-align:center;color:#aaa'>Nenhum curso disponível no momento.</p>";
       return;
     }
 
-    courses.forEach(course => {
+    courses.forEach((course) => {
       const card = document.createElement("div");
       card.className = "card";
 
@@ -43,21 +43,16 @@ async function loadCourses() {
         <img src="${course.image_url || ''}" alt="${course.title}">
         <h3>${course.title}</h3>
         <p>${course.description}</p>
-        <strong>R$ ${course.price}</strong>
+        <strong>${course.price}</strong>
         <a href="${course.checkout_url}" target="_blank">Comprar agora</a>
       `;
 
-      coursesContainer.appendChild(card);
+      container.appendChild(card);
     });
-
   } catch (error) {
     console.error("Erro ao buscar cursos:", error);
-
-    const coursesContainer = document.getElementById("courses-grid");
-    if (coursesContainer) {
-      coursesContainer.innerHTML =
-        "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
-    }
+    container.innerHTML =
+      "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
   }
 }
 
