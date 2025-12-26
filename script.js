@@ -51,7 +51,7 @@ async function loadCourses() {
 
   } catch (error) {
     console.error("Erro ao buscar cursos:", error);
-    const container = document.getElementById("courses");
+    const coursesContainer = document.getElementById('courses-grid');
     if (container) {
       container.innerHTML =
         "<p style='color:red;text-align:center'>Falha ao carregar cursos.</p>";
@@ -61,3 +61,4 @@ async function loadCourses() {
 
 // 🧠 GARANTE QUE O HTML CARREGOU
 document.addEventListener("DOMContentLoaded", loadCourses);
+
